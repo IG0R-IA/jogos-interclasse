@@ -5,62 +5,142 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Painel Interclasses</title>
     <style>
-        /* O mesmo CSS de antes... */
+        /* CSS V2: COM ANIMAÇÕES E ESTILOS DE CALENDÁRIO */
         @import url('https://fonts.googleapis.com/css2?family=Poppins:wght@400;600;700&display=swap');
-        :root { --cor-primaria: #0a2463; --cor-secundaria: #3e92cc; --cor-fundo: #f0f4f8; --cor-texto: #333; --cor-branca: #ffffff; --sombra: 0 4px 15px rgba(0, 0, 0, 0.1); }
-        body { font-family: 'Poppins', sans-serif; background-color: var(--cor-fundo); color: var(--cor-texto); margin: 0; padding: 20px; display: flex; justify-content: center; }
+
+        :root {
+            --cor-primaria: #0a2463;
+            --cor-secundaria: #3e92cc;
+            --cor-sucesso: #2a9d8f;
+            --cor-aviso: #e76f51;
+            --cor-fundo: #f0f4f8;
+            --cor-texto: #333;
+            --cor-branca: #ffffff;
+            --sombra: 0 4px HSL(0, 0%, 0%, 0.1);
+        }
+
+        /* ANIMAÇÕES */
+        @keyframes fadeIn {
+            from { opacity: 0; }
+            to { opacity: 1; }
+        }
+
+        @keyframes slideInUp {
+            from { transform: translateY(20px); opacity: 0; }
+            to { transform: translateY(0); opacity: 1; }
+        }
+
+        body {
+            font-family: 'Poppins', sans-serif;
+            background-color: var(--cor-fundo);
+            color: var(--cor-texto);
+            margin: 0;
+            padding: 20px;
+            display: flex;
+            justify-content: center;
+            animation: fadeIn 0.5s ease-in-out;
+        }
+
         .container { width: 100%; max-width: 900px; }
         header { text-align: center; margin-bottom: 30px; }
         header h1 { color: var(--cor-primaria); font-size: 2.5em; margin: 0; }
+
         .tabs { display: flex; justify-content: center; margin-bottom: 30px; background: var(--cor-branca); border-radius: 50px; padding: 5px; box-shadow: var(--sombra); }
         .tab-button { border: none; background: transparent; padding: 10px 25px; font-size: 1em; font-weight: 600; cursor: pointer; border-radius: 50px; transition: all 0.3s ease; color: var(--cor-secundaria); }
         .tab-button.active { background-color: var(--cor-secundaria); color: var(--cor-branca); box-shadow: 0 2px 5px rgba(0,0,0,0.1); }
-        #search-container { margin-bottom: 20px; }
-        #search-aluno { width: 100%; padding: 15px; font-size: 1.1em; border-radius: 10px; border: 2px solid #ddd; box-sizing: border-box; }
-        #search-aluno:focus { outline: none; border-color: var(--cor-secundaria); }
+        .tab-button:hover:not(.active) { transform: translateY(-2px); }
+        
         .view { display: none; }
         .view.active { display: block; }
-        .card { background-color: var(--cor-branca); border-radius: 12px; padding: 20px; margin-bottom: 20px; box-shadow: var(--sombra); border-left: 5px solid var(--cor-secundaria); }
+        
+        .card {
+            background-color: var(--cor-branca); border-radius: 12px; padding: 20px;
+            margin-bottom: 20px; box-shadow: var(--sombra); border-left: 5px solid var(--cor-secundaria);
+            animation: slideInUp 0.5s ease-out;
+            transition: transform 0.3s ease, box-shadow 0.3s ease;
+        }
+        .card:hover { transform: translateY(-5px); box-shadow: 0 8px 20px rgba(0,0,0,0.1); }
         .card h3 { margin-top: 0; color: var(--cor-primaria); font-size: 1.3em; }
-        .card p { margin: 5px 0; }
-        .card .inscritos-lista { color: #555; font-style: italic; }
-        .horario { margin-top: 15px; }
-        .horario strong { color: var(--cor-secundaria); }
-        .status-jogando { color: #2a9d8f; font-weight: 600; }
-        .status-vendas { color: #e76f51; font-weight: 600; }
+        .card .inscritos-lista { color: #555; font-style: italic; word-break: break-word; }
+
+        /* NOVO ESTILO PARA SELETOR E CALENDÁRIO */
+        #student-selector {
+            width: 100%; padding: 15px; font-size: 1.1em; border-radius: 10px;
+            border: 2px solid #ddd; appearance: none; background-color: white;
+            background-image: url('data:image/svg+xml;charset=US-ASCII,%3Csvg%20xmlns%3D%22http%3A//www.w3.org/2000/svg%22%20width%3D%22292.4%22%20height%3D%22292.4%22%3E%3Cpath%20fill%3D%22%23007CB2%22%20d%3D%22M287%2069.4a17.6%2017.6%200%200%200-13-5.4H18.4c-5%200-9.3%201.8-12.9%205.4A17.6%2017.6%200%200%200%200%2082.2c0%205%201.8%209.3%205.4%2012.9l128%20127.9c3.6%203.6%207.8%205.4%2012.8%205.4s9.2-1.8%2012.8-5.4L287%2095c3.5-3.5%205.4-7.8%205.4-12.8%200-5-1.9-9.2-5.5-12.8z%22/%3E%3C/svg%3E');
+            background-repeat: no-repeat; background-position: right 15px top 50%; background-size: .65em auto;
+        }
+        #calendar-container {
+            display: grid; grid-template-columns: 1fr 1fr; gap: 20px;
+            margin-top: 20px; animation: fadeIn 0.5s;
+        }
+        .calendar-day h2 { text-align: center; color: var(--cor-primaria); }
+        .period-card { background-color: #fff; border-radius: 10px; padding: 15px; box-shadow: var(--sombra); }
+        .period-card h4 { margin: 0 0 10px 0; border-bottom: 2px solid #eee; padding-bottom: 10px; }
+        .status-jogando { color: var(--cor-sucesso); font-weight: 600; }
+        .status-vendas { color: var(--cor-aviso); font-weight: 600; }
         .status-livre { color: #aaa; }
+        .hidden { display: none; }
+
         .loading-message { text-align: center; font-size: 1.2em; color: #888; padding: 50px; }
-        @media (max-width: 600px) { body { padding: 10px; } header h1 { font-size: 1.8em; } .tabs { flex-direction: column; border-radius: 15px;} .tab-button { width: 100%; text-align: center; margin-bottom: 5px;} }
+
+        @media (max-width: 700px) {
+            body { padding: 10px; }
+            header h1 { font-size: 1.8em; }
+            .tabs { flex-direction: column; border-radius: 15px; }
+            #calendar-container { grid-template-columns: 1fr; }
+        }
     </style>
 </head>
 <body>
     <div class="container">
-        <header><h1>Painel dos Jogos Interclasses</h1><p>Encontre sua escalação ou veja os times de cada jogo</p></header>
+        <header>
+            <h1>Painel dos Jogos Interclasses</h1>
+            <p>Encontre sua escalação ou veja os times de cada jogo</p>
+        </header>
+
         <div class="tabs">
             <button class="tab-button active" id="btn-organizador">Visão do Organizador</button>
             <button class="tab-button" id="btn-estudante">Visão do Estudante</button>
         </div>
-        <div id="view-organizador" class="view active"><p class="loading-message">Carregando dados dos jogos...</p></div>
+
+        <div id="view-organizador" class="view active">
+            <p class="loading-message">Carregando dados dos jogos...</p>
+        </div>
+
         <div id="view-estudante" class="view">
-            <div id="search-container"><input type="text" id="search-aluno" placeholder="Digite seu nome para buscar..."></div>
-            <div id="estudante-results"></div>
+            <div id="student-selector-container">
+                <select id="student-selector">
+                    <option value="">-- Selecione seu nome --</option>
+                </select>
+            </div>
+            <div id="calendar-container" class="hidden">
+                <div class="calendar-day">
+                    <h2>Terça-Feira (12/08)</h2>
+                    <div class="period-card" id="terca-manha"><h4>Manhã</h4><p></p></div>
+                    <div class="period-card" id="terca-tarde"><h4>Tarde</h4><p></p></div>
+                </div>
+                <div class="calendar-day">
+                    <h2>Quarta-Feira (13/08)</h2>
+                    <div class="period-card" id="quarta-manha"><h4>Manhã</h4><p></p></div>
+                    <div class="period-card" id="quarta-tarde"><h4>Tarde</h4><p></p></div>
+                </div>
+            </div>
         </div>
     </div>
 
     <script>
-        // ===================================================================================
-        // ÁREA DE CONFIGURAÇÃO DO FRONTEND
-        // ===================================================================================
-        const URL_DA_API = https://script.google.com/macros/s/AKfycbxlGl6VUf7KgOUwPPmR3LAUdfh_a7JVMjBc93l-OEUw4oHIBS0_q0NDl5nUPp6s0uy_vA/exec; // <-- IMPORTANTE!
-        // ===================================================================================
+        const URL_DA_API = 'COLE_AQUI_O_URL_DO_SEU_APP_DA_WEB'; // <-- COLE SEU LINK AQUI
 
         document.addEventListener('DOMContentLoaded', () => {
             const btnOrganizador = document.getElementById('btn-organizador');
             const btnEstudante = document.getElementById('btn-estudante');
             const viewOrganizador = document.getElementById('view-organizador');
             const viewEstudante = document.getElementById('view-estudante');
-            const searchInput = document.getElementById('search-aluno');
-            const estudanteResults = document.getElementById('estudante-results');
+            
+            // Novos elementos
+            const studentSelector = document.getElementById('student-selector');
+            const calendarContainer = document.getElementById('calendar-container');
 
             let dados_organizadores = [];
             let dados_estudantes = [];
@@ -72,21 +152,20 @@
                     const data = await response.json();
                     dados_organizadores = data.organizadores;
                     dados_estudantes = data.estudantes;
-                    renderizarOrganizador(); // Renderiza a visão padrão após carregar os dados
-                    renderizarEstudante(); // Prepara a visão de estudante
+                    
+                    renderizarOrganizador();
+                    popularSeletorDeEstudantes();
+
                 } catch (error) {
                     console.error('Erro ao buscar dados:', error);
                     viewOrganizador.innerHTML = `<p class="loading-message" style="color:red;">Falha ao carregar os dados. Verifique a URL da API.</p>`;
                 }
             }
-            
-            // ... (O resto das funções renderizarOrganizador e renderizarEstudante é igual ao anterior, mas agora usam as variáveis globais)
-             function renderizarOrganizador() { /* ...código de renderização igual ao anterior... */ }
-             function renderizarEstudante(filtro = '') { /* ...código de renderização igual ao anterior... */ }
-            // O código completo das funções de renderização está abaixo para facilitar
-            
+
             function renderizarOrganizador() {
-                if (dados_organizadores.length === 0) { return; }
+                if (!dados_organizadores || dados_organizadores.length === 0) {
+                     viewOrganizador.innerHTML = '<p class="loading-message">Nenhum jogo encontrado.</p>'; return;
+                }
                 let html = '';
                 dados_organizadores.forEach(item => {
                     html += `<div class="card"><h3>${item.jogo}</h3><p><strong>Inscritos (${item.inscritos.length}):</strong></p><p class="inscritos-lista">${item.inscritos.join(', ')}</p></div>`;
@@ -94,52 +173,63 @@
                 viewOrganizador.innerHTML = html;
             }
 
-            function renderizarEstudante(filtro = '') {
-                const termoBusca = filtro.toLowerCase().trim();
-                if (!termoBusca) {
-                     estudanteResults.innerHTML = '<p>Digite seu nome na busca para ver seu cronograma.</p>';
-                     return;
-                }
-                const filtrados = dados_estudantes.filter(est => est.aluno.toLowerCase().includes(termoBusca));
-                if (filtrados.length === 0) {
-                    estudanteResults.innerHTML = '<p>Nenhum aluno encontrado com esse nome.</p>';
-                    return;
-                }
-                let html = '';
-                filtrados.forEach(est => {
-                    let horariosHtml = '';
-                    for (const [periodo, status] of Object.entries(est.horarios)) {
-                        let statusClass = 'status-livre';
-                        if (status.startsWith('JOGANDO')) statusClass = 'status-jogando';
-                        if (status.startsWith('Equipe')) statusClass = 'status-vendas';
-                        horariosHtml += `<div class="horario"><strong>${periodo}:</strong> <span class="${statusClass}">${status}</span></div>`;
-                    }
-                    html += `<div class="card"><h3>${est.aluno} <span style="font-weight:400; font-size: 0.8em; color: #888;">(${est.turma})</span></h3>${horariosHtml}</div>`;
+            // NOVA LÓGICA PARA A VISÃO DO ESTUDANTE
+            function popularSeletorDeEstudantes() {
+                if (!dados_estudantes) return;
+                dados_estudantes.forEach(est => {
+                    const option = document.createElement('option');
+                    option.value = est.aluno;
+                    option.textContent = est.aluno;
+                    studentSelector.appendChild(option);
                 });
-                estudanteResults.innerHTML = html;
             }
 
-            btnOrganizador.addEventListener('click', () => { /* ...lógica dos botões igual à anterior... */ });
-            btnEstudante.addEventListener('click', () => { /* ...lógica dos botões igual à anterior... */ });
-            // Cole a lógica dos botões aqui
-             btnOrganizador.addEventListener('click', () => {
+            function renderizarCalendario(nomeAluno) {
+                if (!nomeAluno) {
+                    calendarContainer.classList.add('hidden');
+                    return;
+                }
+                
+                const aluno = dados_estudantes.find(est => est.aluno === nomeAluno);
+                if (!aluno) return;
+
+                const horarios = {
+                    "terca-manha": aluno.horarios["Manhã Terça (12/08)"],
+                    "terca-tarde": aluno.horarios["Tarde Terça (12/08)"],
+                    "quarta-manha": aluno.horarios["Manhã Quarta (13/08)"],
+                    "quarta-tarde": aluno.horarios["Tarde Quarta (13/08)"],
+                };
+
+                for(const [elementId, status] of Object.entries(horarios)) {
+                    const p = document.querySelector(`#${elementId} p`);
+                    let statusClass = 'status-livre';
+                    if (status.startsWith('JOGANDO')) statusClass = 'status-jogando';
+                    if (status.startsWith('Equipe')) statusClass = 'status-vendas';
+
+                    p.textContent = status;
+                    p.className = statusClass;
+                }
+                
+                calendarContainer.classList.remove('hidden');
+            }
+
+            // Event Listeners
+            btnOrganizador.addEventListener('click', () => {
                 btnOrganizador.classList.add('active'); btnEstudante.classList.remove('active');
                 viewOrganizador.classList.add('active'); viewEstudante.classList.remove('active');
             });
+
             btnEstudante.addEventListener('click', () => {
                 btnEstudante.classList.add('active'); btnOrganizador.classList.remove('active');
                 viewEstudante.classList.add('active'); viewOrganizador.classList.remove('active');
-                renderizarEstudante(searchInput.value);
+            });
+            
+            studentSelector.addEventListener('change', (e) => {
+                renderizarCalendario(e.target.value);
             });
 
-
-            searchInput.addEventListener('input', () => { renderizarEstudante(searchInput.value); });
-
-            // Inicia o carregamento dos dados
             buscarDados();
         });
     </script>
 </body>
-
 </html>
-
