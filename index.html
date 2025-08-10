@@ -1,0 +1,143 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Painel Interclasses</title>
+    <style>
+        /* O mesmo CSS de antes... */
+        @import url('https://fonts.googleapis.com/css2?family=Poppins:wght@400;600;700&display=swap');
+        :root { --cor-primaria: #0a2463; --cor-secundaria: #3e92cc; --cor-fundo: #f0f4f8; --cor-texto: #333; --cor-branca: #ffffff; --sombra: 0 4px 15px rgba(0, 0, 0, 0.1); }
+        body { font-family: 'Poppins', sans-serif; background-color: var(--cor-fundo); color: var(--cor-texto); margin: 0; padding: 20px; display: flex; justify-content: center; }
+        .container { width: 100%; max-width: 900px; }
+        header { text-align: center; margin-bottom: 30px; }
+        header h1 { color: var(--cor-primaria); font-size: 2.5em; margin: 0; }
+        .tabs { display: flex; justify-content: center; margin-bottom: 30px; background: var(--cor-branca); border-radius: 50px; padding: 5px; box-shadow: var(--sombra); }
+        .tab-button { border: none; background: transparent; padding: 10px 25px; font-size: 1em; font-weight: 600; cursor: pointer; border-radius: 50px; transition: all 0.3s ease; color: var(--cor-secundaria); }
+        .tab-button.active { background-color: var(--cor-secundaria); color: var(--cor-branca); box-shadow: 0 2px 5px rgba(0,0,0,0.1); }
+        #search-container { margin-bottom: 20px; }
+        #search-aluno { width: 100%; padding: 15px; font-size: 1.1em; border-radius: 10px; border: 2px solid #ddd; box-sizing: border-box; }
+        #search-aluno:focus { outline: none; border-color: var(--cor-secundaria); }
+        .view { display: none; }
+        .view.active { display: block; }
+        .card { background-color: var(--cor-branca); border-radius: 12px; padding: 20px; margin-bottom: 20px; box-shadow: var(--sombra); border-left: 5px solid var(--cor-secundaria); }
+        .card h3 { margin-top: 0; color: var(--cor-primaria); font-size: 1.3em; }
+        .card p { margin: 5px 0; }
+        .card .inscritos-lista { color: #555; font-style: italic; }
+        .horario { margin-top: 15px; }
+        .horario strong { color: var(--cor-secundaria); }
+        .status-jogando { color: #2a9d8f; font-weight: 600; }
+        .status-vendas { color: #e76f51; font-weight: 600; }
+        .status-livre { color: #aaa; }
+        .loading-message { text-align: center; font-size: 1.2em; color: #888; padding: 50px; }
+        @media (max-width: 600px) { body { padding: 10px; } header h1 { font-size: 1.8em; } .tabs { flex-direction: column; border-radius: 15px;} .tab-button { width: 100%; text-align: center; margin-bottom: 5px;} }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <header><h1>Painel dos Jogos Interclasses</h1><p>Encontre sua escalação ou veja os times de cada jogo</p></header>
+        <div class="tabs">
+            <button class="tab-button active" id="btn-organizador">Visão do Organizador</button>
+            <button class="tab-button" id="btn-estudante">Visão do Estudante</button>
+        </div>
+        <div id="view-organizador" class="view active"><p class="loading-message">Carregando dados dos jogos...</p></div>
+        <div id="view-estudante" class="view">
+            <div id="search-container"><input type="text" id="search-aluno" placeholder="Digite seu nome para buscar..."></div>
+            <div id="estudante-results"></div>
+        </div>
+    </div>
+
+    <script>
+        // ===================================================================================
+        // ÁREA DE CONFIGURAÇÃO DO FRONTEND
+        // ===================================================================================
+        const URL_DA_API = 'https://script.google.com/macros/s/AKfycbwFV8jpjUf41ccVPNchlAbKW-IX3WiIR-gicX7_NdSoB93qdh3107_idFPq7V5o9QM/exec'; // <-- IMPORTANTE!
+        // ===================================================================================
+
+        document.addEventListener('DOMContentLoaded', () => {
+            const btnOrganizador = document.getElementById('btn-organizador');
+            const btnEstudante = document.getElementById('btn-estudante');
+            const viewOrganizador = document.getElementById('view-organizador');
+            const viewEstudante = document.getElementById('view-estudante');
+            const searchInput = document.getElementById('search-aluno');
+            const estudanteResults = document.getElementById('estudante-results');
+
+            let dados_organizadores = [];
+            let dados_estudantes = [];
+            
+            async function buscarDados() {
+                try {
+                    const response = await fetch(URL_DA_API);
+                    if (!response.ok) { throw new Error('Erro na rede: ' + response.statusText); }
+                    const data = await response.json();
+                    dados_organizadores = data.organizadores;
+                    dados_estudantes = data.estudantes;
+                    renderizarOrganizador(); // Renderiza a visão padrão após carregar os dados
+                    renderizarEstudante(); // Prepara a visão de estudante
+                } catch (error) {
+                    console.error('Erro ao buscar dados:', error);
+                    viewOrganizador.innerHTML = `<p class="loading-message" style="color:red;">Falha ao carregar os dados. Verifique a URL da API.</p>`;
+                }
+            }
+            
+            // ... (O resto das funções renderizarOrganizador e renderizarEstudante é igual ao anterior, mas agora usam as variáveis globais)
+             function renderizarOrganizador() { /* ...código de renderização igual ao anterior... */ }
+             function renderizarEstudante(filtro = '') { /* ...código de renderização igual ao anterior... */ }
+            // O código completo das funções de renderização está abaixo para facilitar
+            
+            function renderizarOrganizador() {
+                if (dados_organizadores.length === 0) { return; }
+                let html = '';
+                dados_organizadores.forEach(item => {
+                    html += `<div class="card"><h3>${item.jogo}</h3><p><strong>Inscritos (${item.inscritos.length}):</strong></p><p class="inscritos-lista">${item.inscritos.join(', ')}</p></div>`;
+                });
+                viewOrganizador.innerHTML = html;
+            }
+
+            function renderizarEstudante(filtro = '') {
+                const termoBusca = filtro.toLowerCase().trim();
+                if (!termoBusca) {
+                     estudanteResults.innerHTML = '<p>Digite seu nome na busca para ver seu cronograma.</p>';
+                     return;
+                }
+                const filtrados = dados_estudantes.filter(est => est.aluno.toLowerCase().includes(termoBusca));
+                if (filtrados.length === 0) {
+                    estudanteResults.innerHTML = '<p>Nenhum aluno encontrado com esse nome.</p>';
+                    return;
+                }
+                let html = '';
+                filtrados.forEach(est => {
+                    let horariosHtml = '';
+                    for (const [periodo, status] of Object.entries(est.horarios)) {
+                        let statusClass = 'status-livre';
+                        if (status.startsWith('JOGANDO')) statusClass = 'status-jogando';
+                        if (status.startsWith('Equipe')) statusClass = 'status-vendas';
+                        horariosHtml += `<div class="horario"><strong>${periodo}:</strong> <span class="${statusClass}">${status}</span></div>`;
+                    }
+                    html += `<div class="card"><h3>${est.aluno} <span style="font-weight:400; font-size: 0.8em; color: #888;">(${est.turma})</span></h3>${horariosHtml}</div>`;
+                });
+                estudanteResults.innerHTML = html;
+            }
+
+            btnOrganizador.addEventListener('click', () => { /* ...lógica dos botões igual à anterior... */ });
+            btnEstudante.addEventListener('click', () => { /* ...lógica dos botões igual à anterior... */ });
+            // Cole a lógica dos botões aqui
+             btnOrganizador.addEventListener('click', () => {
+                btnOrganizador.classList.add('active'); btnEstudante.classList.remove('active');
+                viewOrganizador.classList.add('active'); viewEstudante.classList.remove('active');
+            });
+            btnEstudante.addEventListener('click', () => {
+                btnEstudante.classList.add('active'); btnOrganizador.classList.remove('active');
+                viewEstudante.classList.add('active'); viewOrganizador.classList.remove('active');
+                renderizarEstudante(searchInput.value);
+            });
+
+
+            searchInput.addEventListener('input', () => { renderizarEstudante(searchInput.value); });
+
+            // Inicia o carregamento dos dados
+            buscarDados();
+        });
+    </script>
+</body>
+</html>
